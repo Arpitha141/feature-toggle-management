@@ -35,7 +35,10 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 	public FeatureToggleResponse createFeature(FeatureCreateRequest request) {
 		validationService.validateFeatureName(request.featureName());
 		
-		if (repository.existsByFeatureNameAndEnvironment(request.featureName(), request.environment())) {
+		//Convert the validated string back to Enum
+		Environment envEnum = Environment.valueOf(request.environment()); 
+		
+		if (repository.existsByFeatureNameAndEnvironment(request.featureName(), envEnum)) {
             throw new DataIntegrityViolationException(
                 String.format("Feature '%s' already exists in environment '%s'", 
                               request.featureName(), request.environment())
@@ -44,7 +47,7 @@ public class FeatureToggleServiceImpl implements FeatureToggleService {
 		
 		FeatureToggle featureToggle = new FeatureToggle(
                 request.featureName(),
-                request.environment(),
+                envEnum,
                 request.enabled()
         );
 		
